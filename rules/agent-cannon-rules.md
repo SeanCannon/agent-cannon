@@ -81,7 +81,26 @@ After writing or modifying code, run the build command to catch errors. Run the 
 
 If the build fails, fix it. If tests fail, fix them. If the user opted out of verification (config.json: `build_verification: false`), skip it but note the omission.
 
-**9. ALWAYS update documentation before delivering work.**
+**9. Prefer deterministic checks. Use LLM only when necessary.**
+Deterministic checks are cheap and fast. LLM calls cost tokens. Know the difference.
+
+**Deterministic checks (no LLM, run always):**
+- `npm run build` / `cargo build` → build passes
+- `npm test` / `cargo test` → tests pass
+- ESLint: no commented-out code
+- ESLint: no third-party imports in application directories
+- ESLint: file location conventions (lib/ vs app/)
+- ESLint: 3+ branch if/else chains → must refactor to strategy map
+- ESLint: side effects in functions marked pure → flag
+- TypeScript/Rust: strict mode enforces purity via types
+
+**LLM required (judgment calls, invoke only when flagged):**
+- "Should this branching logic be a strategy?" → flagged by lint, LLM confirms
+- "Does this mock implement its interface correctly?" → interface compliance + tests pass = deterministic, but LLM can spot subtle behavioral mismatches
+
+**Economics:** Most violations are caught by lint. LLM involvement should be rare. If you're calling LLM verification often, the lint rules aren't tight enough. Fix the lint rules.
+
+**10. ALWAYS update documentation before delivering work.**
 Documentation lives in READMEs and markdown files, not in code comments. Code should be self-documenting through function and variable names. Unit tests should convey system intent. When documentation needs updating, prefer updating the project's README or relevant markdown docs over adding comments to source code.
 
 Documentation priorities:
@@ -91,7 +110,7 @@ Documentation priorities:
 - Code comments explain why, never what. If the code needs a comment to explain itself, rename it.
 - Unit tests serve as living documentation of system intent and behavior.
 
-**10. NEVER create stub or facade mocks. Every mock must be a working strategy.**
+**11. NEVER create stub or facade mocks. Every mock must be a working strategy.**
 A mock that does nothing is a lie. It gives a false sense of progress, misleads agents reading the code, and forces test rewrites when replaced with real implementations. If you need to mock functionality for development, embed it in a working strategy handler that does the thing. A placeholder strategy is fine. A stub that breaks the contract is not.
 
 ```js
@@ -104,7 +123,7 @@ const mockHandler = { handle: (data) => ({ ...data, status: 'mocked' }) };
 
 Golden rule: if the unit tests have to change when you replace a placeholder with real code, the original was architected short-sightedly. Write tests once against the strategy interface, not against specific implementations.
 
-**11. ALWAYS separate utility logic from application logic.**
+**12. ALWAYS separate utility logic from application logic.**
 Utility logic is pure, composable, and deployable independently. Application logic wires utilities into your specific project. Never the reverse. Third-party dependencies live in utility strategies, never in application code. When you pivot or change your mind, you only rewrite application logic, not the utilities that took time to get right.
 
 Stack conventions:
@@ -247,12 +266,14 @@ You are a collaborator. You run checks, surface findings, and make recommendatio
 
 - **Scope**: All code generation, regardless of language
 - **Override policy**: Project-specific rules may override these; state overrides in project planning context
-- **When to enforce**: After every code write, before code acceptance
-- **When NOT to enforce**: Non-code files (markdown, config JSON without logic), third-party/vendor code
+- **When to enforce**: After every code write, before code acceptance, before claiming delivery
+- **Verification gate**: No code is delivered without passing all verification agents. No exceptions unless user explicitly overrides and documents it.
+- **Deterministic first**: Run lint and bash checks before invoking LLM agents. LLM involvement is expensive. Don't use it for pattern matching.
 - **Language detection**: Check file extension to determine language-specific enforcement rules
 - **Reference loading**: Verification agents should load specific references:
   - Pattern checker → `references/strategy-pattern.md`, `references/pure-functions.md`, `references/code-quality.md`
   - Test verifier → `references/testing-standards.md`
+  - Linter configs → `references/linter-configs.md`
   - Anti-pattern detector → `references/anti-patterns.md`
 
 ---
