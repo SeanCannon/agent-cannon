@@ -1,0 +1,31 @@
+{
+  "name": "agent-cannon",
+  "version": "0.1.0",
+  "rules_file": "~/.config/opencode/rules/agent-cannon-rules.md",
+  "agents": {
+    "pattern_checker": "~/.config/opencode/agents/ac-pattern-checker.md",
+    "test_verifier": "~/.config/opencode/agents/ac-test-verifier.md",
+    "anti_pattern_detector": "~/.config/opencode/agents/ac-anti-pattern-detector.md",
+    "orchestrator": "~/.config/opencode/agents/ac-orchestrator.md",
+    "code_quality": "~/.config/opencode/agents/ac-code-quality.md"
+  },
+  "commands": {
+    "new_project": "~/.config/opencode/command/ac-new-project.md",
+    "plan_phase": "~/.config/opencode/command/ac-plan-phase.md",
+    "execute_phase": "~/.config/opencode/command/ac-execute-phase.md",
+    "verify": "~/.config/opencode/command/ac-verify.md"
+  },
+  "workflows": {
+    "new_project": "~/.config/opencode/agent-cannon/workflows/new-project.md",
+    "plan_phase": "~/.config/opencode/agent-cannon/workflows/plan-phase.md",
+    "execute_phase": "~/.config/opencode/agent-cannon/workflows/execute-phase.md"
+  },
+  "cli": "~/.config/opencode/agent-cannon/bin/ac-tools.cjs",
+  "planning_dir": ".planning",
+  "verification": {
+    "timeout_seconds": 30,
+    "severity_levels": ["CRITICAL", "WARNING"],
+    "blocking_severity": ["CRITICAL"],
+    "build_verification": true
+  }
+}

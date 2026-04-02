@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1200 420">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0d0d0d"/>
+      <stop offset="100%" style="stop-color:#1a1a1a"/>
+    </linearGradient>
+    <clipPath id="circle-clip">
+      <circle cx="170" cy="210" r="130"/>
+    </clipPath>
+    <filter id="grayscale">
+      <feColorMatrix type="saturate" values="0"/>
+      <feComponentTransfer>
+        <feFuncR type="linear" slope="0.9" intercept="0.05"/>
+        <feFuncG type="linear" slope="0.9" intercept="0.05"/>
+        <feFuncB type="linear" slope="0.9" intercept="0.05"/>
+      </feComponentTransfer>
+    </filter>
+    <filter id="contrast">
+      <feComponentTransfer>
+        <feFuncR type="linear" slope="1.2" intercept="-0.1"/>
+        <feFuncG type="linear" slope="1.2" intercept="-0.1"/>
+        <feFuncB type="linear" slope="1.2" intercept="-0.1"/>
+      </feComponentTransfer>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="420" fill="url(#bg)"/>
+
+  <!-- Subtle noise -->
+  <rect width="1200" height="420" fill="#ffffff" opacity="0.015"/>
+
+  <!-- Photo circle -->
+  <image href="https://creativemeadow.com/wp-content/uploads/2023/10/16266-600x600.jpeg"
+         x="40" y="80" width="260" height="260"
+         clip-path="url(#circle-clip)"
+         filter="url(#grayscale) url(#contrast)"
+         opacity="0.85"/>
+
+  <!-- Photo circle border -->
+  <circle cx="170" cy="210" r="131" fill="none" stroke="#ffffff" stroke-width="1" opacity="0.2"/>
+  <circle cx="170" cy="210" r="133" fill="none" stroke="#ffffff" stroke-width="0.5" opacity="0.08"/>
+
+  <!-- Vertical divider -->
+  <line x1="340" y1="100" x2="340" y2="320" stroke="#ffffff" stroke-width="0.5" opacity="0.15"/>
+
+  <!-- Title -->
+  <text x="380" y="195" font-family="Georgia, 'Times New Roman', serif" font-size="80" font-weight="300" fill="#ffffff" letter-spacing="8">AGENT</text>
+  <text x="380" y="275" font-family="Georgia, 'Times New Roman', serif" font-size="80" font-weight="700" fill="#ffffff" letter-spacing="8">CANNON</text>
+
+  <!-- Tagline -->
+  <text x="380" y="320" font-family="'Helvetica Neue', Arial, sans-serif" font-size="13" font-weight="300" fill="#666666" letter-spacing="6">ENFORCE THE STANDARD. EVERY TIME.</text>
+
+  <!-- Version -->
+  <text x="380" y="365" font-family="'Helvetica Neue', Arial, sans-serif" font-size="11" font-weight="400" fill="#444444" letter-spacing="3">v0.1.0</text>
+
+  <!-- Bottom rule -->
+  <line x1="380" y1="385" x2="520" y2="385" stroke="#ffffff" stroke-width="0.5" opacity="0.1"/>
+
+  <!-- Corner marks -->
+  <g stroke="#ffffff" stroke-width="0.5" opacity="0.1">
+    <path d="M20,20 L20,50"/>
+    <path d="M20,20 L50,20"/>
+    <path d="M1180,20 L1180,50"/>
+    <path d="M1180,20 L1150,20"/>
+    <path d="M20,400 L20,370"/>
+    <path d="M20,400 L50,400"/>
+    <path d="M1180,400 L1180,370"/>
+    <path d="M1180,400 L1150,400"/>
+  </g>
+</svg>
