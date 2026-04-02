@@ -9,6 +9,8 @@
   An open-source AI coding agent that enforces best practices during pair-programming.<br/>
   Built on <em><a href="https://github.com/succeedinsoftware/book" target="_blank">Succeed In Software</a></em> by Sean Cannon. 
   30 years of industry experience, automated.
+<br /><br />
+<em>Inspired by <a href="https://github.com/gsd-build/get-shit-done" target="_blank">GSD</a> 🙏</em>
 </div>
 
 <br/>
@@ -192,6 +194,10 @@ node ~/.config/opencode/agent-cannon/bin/ac-tools.cjs help
 <td style="border:1px solid #333; padding:10px;"><code>/ac-verify [file]</code></td>
 <td style="border:1px solid #333; padding:10px;">Run standalone verification against existing code</td>
 </tr>
+<tr>
+<td style="border:1px solid #333; padding:10px;"><code>/ac-new-issue &lt;text or URL&gt;</code></td>
+<td style="border:1px solid #333; padding:10px;">Tackle an issue. Accepts raw text or a Jira/GitHub URL. Breaks work into utility logic (additive, safe) and application logic (integration). Utility first so you can pause without unwinding.</td>
+</tr>
 </table>
 
 <br/>
@@ -292,13 +298,15 @@ AI writes code
 │   ├── ac-new-project.md
 │   ├── ac-plan-phase.md
 │   ├── ac-execute-phase.md
-│   └── ac-verify.md
+│   ├── ac-verify.md
+│   └── ac-new-issue.md
 └── agent-cannon/
     ├── bin/ac-tools.cjs              CLI tool
     ├── config.json
     └── workflows/
         ├── execute-phase.md          Verification gate workflow
         ├── new-project.md
+        ├── new-issue.md              Issue breakdown workflow
         └── plan-phase.md
 ```
 

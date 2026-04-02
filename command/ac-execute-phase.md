@@ -21,7 +21,7 @@ After every code write, verification agents check compliance:
 </objective>
 
 <execution_context>
-@/Users/seancannon/.config/opencode/agent-cannon/workflows/execute-phase.md
+@~/.config/opencode/agent-cannon/workflows/execute-phase.md
 </execution_context>
 
 <context>
@@ -36,6 +36,6 @@ Phase: $ARGUMENTS
 </context>
 
 <process>
-Execute the execute-phase workflow from @/Users/seancannon/.config/opencode/agent-cannon/workflows/execute-phase.md end-to-end.
+Execute the execute-phase workflow from @~/.config/opencode/agent-cannon/workflows/execute-phase.md end-to-end.
 Preserve all workflow gates (wave execution, verification, state updates, routing).
 </process>

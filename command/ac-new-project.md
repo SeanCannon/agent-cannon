@@ -26,7 +26,7 @@ With Agent Cannon rules loaded as system context for the entire session.
 </objective>
 
 <execution_context>
-@/Users/seancannon/.config/opencode/agent-cannon/workflows/new-project.md
+@~/.config/opencode/agent-cannon/workflows/new-project.md
 </execution_context>
 
 <context>
@@ -35,6 +35,6 @@ With Agent Cannon rules loaded as system context for the entire session.
 </context>
 
 <process>
-Execute the new-project workflow from @/Users/seancannon/.config/opencode/agent-cannon/workflows/new-project.md end-to-end.
+Execute the new-project workflow from @~/.config/opencode/agent-cannon/workflows/new-project.md end-to-end.
 Preserve all workflow gates (validation, approvals, commits, routing).
 </process>

@@ -19,7 +19,7 @@ Read ~/.config/opencode/rules/agent-cannon-rules.md to understand CRITICAL rules
 Load all context in one call:
 
 ```bash
-INIT=$(node /Users/seancannon/.config/opencode/agent-cannon/bin/ac-tools.cjs init execute-phase "${PHASE_ARG}")
+INIT=$(node ~/.config/opencode/agent-cannon/bin/ac-tools.cjs init execute-phase "${PHASE_ARG}")
 ```
 
 Parse JSON for: `executor_model`, `verifier_model`, `commit_docs`, `parallelization`, `branching_strategy`, `branch_name`, `phase_found`, `phase_dir`, `phase_number`, `phase_name`, `phase_slug`, `plans`, `incomplete_plans`, `plan_count`, `incomplete_count`, `state_exists`, `roadmap_exists`.
@@ -54,7 +54,7 @@ Report: "Found {plan_count} plans in {phase_dir} ({incomplete_count} incomplete)
 Load plan inventory with wave grouping:
 
 ```bash
-PLAN_INDEX=$(node /Users/seancannon/.config/opencode/agent-cannon/bin/ac-tools.cjs phase-plan-index "${PHASE_NUMBER}")
+PLAN_INDEX=$(node ~/.config/opencode/agent-cannon/bin/ac-tools.cjs phase-plan-index "${PHASE_NUMBER}")
 ```
 
 Parse JSON for: `phase`, `plans[]` (each with `id`, `wave`, `autonomous`, `objective`, `files_modified`, `task_count`, `has_summary`), `waves` (map of wave number → plan IDs), `incomplete`, `has_checkpoints`.
@@ -107,7 +107,7 @@ Execute each wave in sequence. Within a wave: parallel if `PARALLELIZATION=true`
        </objective>
 
        <execution_context>
-       @/Users/seancannon/.config/opencode/agent-cannon/workflows/execute-plan.md
+       @~/.config/opencode/agent-cannon/workflows/execute-plan.md
        </execution_context>
 
        <files_to_read>
@@ -212,7 +212,7 @@ Execute each wave in sequence. Within a wave: parallel if `PARALLELIZATION=true`
 6. **Commit verified changes (if not blocked):**
 
    ```bash
-   node /Users/seancannon/.config/opencode/agent-cannon/bin/ac-tools.cjs commit "feat(phase-{X}): {plan objective}" --files {verified_files}
+   node ~/.config/opencode/agent-cannon/bin/ac-tools.cjs commit "feat(phase-{X}): {plan objective}" --files {verified_files}
    ```
 
 7. **Report wave completion:**
@@ -287,7 +287,7 @@ After all waves:
 Verify phase achieved its GOAL, not just completed tasks.
 
 ```bash
-PHASE_REQ_IDS=$(node /Users/seancannon/.config/opencode/agent-cannon/bin/ac-tools.cjs roadmap get-phase "${PHASE_NUMBER}" | jq -r '.section' | grep -i "Requirements:" | sed 's/.*Requirements:\*\*\s*//' | sed 's/[\[\]]//g')
+PHASE_REQ_IDS=$(node ~/.config/opencode/agent-cannon/bin/ac-tools.cjs roadmap get-phase "${PHASE_NUMBER}" | jq -r '.section' | grep -i "Requirements:" | sed 's/.*Requirements:\*\*\s*//' | sed 's/[\[\]]//g')
 ```
 
 ```
@@ -322,7 +322,7 @@ grep "^status:" "$PHASE_DIR"/*-VERIFICATION.md | cut -d: -f2 | tr -d ' '
 **Mark phase complete and update all tracking files:**
 
 ```bash
-COMPLETION=$(node /Users/seancannon/.config/opencode/agent-cannon/bin/ac-tools.cjs phase complete "${PHASE_NUMBER}")
+COMPLETION=$(node ~/.config/opencode/agent-cannon/bin/ac-tools.cjs phase complete "${PHASE_NUMBER}")
 ```
 
 The CLI handles:
@@ -332,7 +332,7 @@ The CLI handles:
 - Updating REQUIREMENTS.md traceability
 
 ```bash
-node /Users/seancannon/.config/opencode/agent-cannon/bin/ac-tools.cjs commit "docs(phase-{X}): complete phase execution" --files .planning/ROADMAP.md .planning/STATE.md .planning/REQUIREMENTS.md .planning/phases/{phase_dir}/*-VERIFICATION.md
+node ~/.config/opencode/agent-cannon/bin/ac-tools.cjs commit "docs(phase-{X}): complete phase execution" --files .planning/ROADMAP.md .planning/STATE.md .planning/REQUIREMENTS.md .planning/phases/{phase_dir}/*-VERIFICATION.md
 ```
 </step>
 

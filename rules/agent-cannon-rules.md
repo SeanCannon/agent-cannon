@@ -84,6 +84,16 @@ After writing or modifying code, run the project's build/compile command to catc
 
 Detect the project type and run the appropriate command. If the build fails, fix it before proceeding. If the user opted out of build verification (config.json: `build_verification: false`), skip this step.
 
+**9. ALWAYS update documentation before delivering work.**
+Documentation lives in READMEs and markdown files, not in code comments. Code should be self-documenting through function and variable names. Unit tests should convey system intent. When documentation needs updating, prefer updating the project's README or relevant markdown docs over adding comments to source code.
+
+Documentation priorities:
+- Adhere to existing project documentation conventions first
+- Less is more. Don't over-document.
+- Docs are agent-friendly first, human-friendly second. Clear structure, accurate paths, correct commands.
+- Code comments explain why, never what. If the code needs a comment to explain itself, rename it.
+- Unit tests serve as living documentation of system intent and behavior.
+
 ---
 
 ## Language Awareness

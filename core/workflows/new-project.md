@@ -16,7 +16,7 @@ Read ~/.config/opencode/rules/agent-cannon-rules.md — rules apply to ALL code 
 **MANDATORY FIRST STEP — Execute these checks before ANY user interaction:**
 
 ```bash
-INIT=$(node /Users/seancannon/.config/opencode/agent-cannon/bin/ac-tools.cjs init new-project)
+INIT=$(node ~/.config/opencode/agent-cannon/bin/ac-tools.cjs init new-project)
 ```
 
 Parse JSON for: `project_exists`, `has_codebase_map`, `planning_exists`, `has_existing_code`, `has_git`.
@@ -115,7 +115,7 @@ Initialize requirements as hypotheses:
 
 ```bash
 mkdir -p .planning
-node /Users/seancannon/.config/opencode/agent-cannon/bin/ac-tools.cjs commit "docs: initialize project" --files .planning/PROJECT.md
+node ~/.config/opencode/agent-cannon/bin/ac-tools.cjs commit "docs: initialize project" --files .planning/PROJECT.md
 ```
 
 ## 4. Workflow Configuration
@@ -169,7 +169,7 @@ Create `.planning/config.json`:
 ```
 
 ```bash
-node /Users/seancannon/.config/opencode/agent-cannon/bin/ac-tools.cjs commit "chore: add project config" --files .planning/config.json
+node ~/.config/opencode/agent-cannon/bin/ac-tools.cjs commit "chore: add project config" --files .planning/config.json
 ```
 
 ## 5. Research Decision
@@ -244,7 +244,7 @@ For each category, use question to scope v1/v2/out-of-scope.
 **REQ-ID format:** `[CATEGORY]-[NUMBER]` (AUTH-01, CONTENT-02)
 
 ```bash
-node /Users/seancannon/.config/opencode/agent-cannon/bin/ac-tools.cjs commit "docs: define v1 requirements" --files .planning/REQUIREMENTS.md
+node ~/.config/opencode/agent-cannon/bin/ac-tools.cjs commit "docs: define v1 requirements" --files .planning/REQUIREMENTS.md
 ```
 
 ## 7. Create Roadmap
@@ -269,7 +269,7 @@ Task(prompt="
 </planning_context>
 
 <agent_cannon_rules>
-@/Users/seancannon/.config/opencode/rules/agent-cannon-rules.md
+@~/.config/opencode/rules/agent-cannon-rules.md
 
 Phase plans MUST account for:
 - Test infrastructure setup (DI, mocking)
@@ -291,7 +291,7 @@ Phase plans MUST account for:
 **Present roadmap. Get approval. Commit.**
 
 ```bash
-node /Users/seancannon/.config/opencode/agent-cannon/bin/ac-tools.cjs commit "docs: create roadmap ([N] phases)" --files .planning/ROADMAP.md .planning/STATE.md .planning/REQUIREMENTS.md
+node ~/.config/opencode/agent-cannon/bin/ac-tools.cjs commit "docs: create roadmap ([N] phases)" --files .planning/ROADMAP.md .planning/STATE.md .planning/REQUIREMENTS.md
 ```
 
 ## 8. Done

@@ -15,7 +15,7 @@ Create executable phase plans (PLAN.md files) with Agent Cannon enforcement.
 </objective>
 
 <execution_context>
-@/Users/seancannon/.config/opencode/agent-cannon/workflows/plan-phase.md
+@~/.config/opencode/agent-cannon/workflows/plan-phase.md
 </execution_context>
 
 <context>
@@ -27,6 +27,6 @@ Phase number: $ARGUMENTS (optional — auto-detects next unplanned phase if omit
 </context>
 
 <process>
-Execute the plan-phase workflow from @/Users/seancannon/.config/opencode/agent-cannon/workflows/plan-phase.md end-to-end.
+Execute the plan-phase workflow from @~/.config/opencode/agent-cannon/workflows/plan-phase.md end-to-end.
 Preserve all workflow gates (validation, research, planning, verification loop, routing).
 </process>

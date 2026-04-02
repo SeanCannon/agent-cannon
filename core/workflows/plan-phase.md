@@ -16,7 +16,7 @@ Read ~/.config/opencode/rules/agent-cannon-rules.md before spawning any agent.
 Load all context in one call:
 
 ```bash
-INIT=$(node /Users/seancannon/.config/opencode/agent-cannon/bin/ac-tools.cjs init plan-phase "$PHASE")
+INIT=$(node ~/.config/opencode/agent-cannon/bin/ac-tools.cjs init plan-phase "$PHASE")
 ```
 
 Parse JSON for: `planner_model`, `researcher_model`, `checker_model`, `research_enabled`, `plan_checker_enabled`, `phase_found`, `phase_dir`, `phase_number`, `phase_name`, `phase_slug`, `has_research`, `has_context`, `has_plans`, `plan_count`, `planning_exists`, `roadmap_exists`.
@@ -36,7 +36,7 @@ Extract from $ARGUMENTS: phase number, flags (`--research`, `--skip-research`, `
 ## 3. Validate Phase
 
 ```bash
-PHASE_INFO=$(node /Users/seancannon/.config/opencode/agent-cannon/bin/ac-tools.cjs roadmap get-phase "${PHASE}")
+PHASE_INFO=$(node ~/.config/opencode/agent-cannon/bin/ac-tools.cjs roadmap get-phase "${PHASE}")
 ```
 
 Extract: `phase_number`, `phase_name`, `goal`, `requirements`.
@@ -46,7 +46,7 @@ Extract: `phase_number`, `phase_name`, `goal`, `requirements`.
 **CRITICAL:** Rules MUST be loaded and passed to every agent spawn.
 
 ```bash
-RULES_CONTENT=$(cat /Users/seancannon/.config/opencode/rules/agent-cannon-rules.md)
+RULES_CONTENT=$(cat ~/.config/opencode/rules/agent-cannon-rules.md)
 ```
 
 Rules context for agent prompts:

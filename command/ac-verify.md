@@ -16,7 +16,7 @@ Accepts an optional file path. If omitted, scans all project source files.
 </objective>
 
 <execution_context>
-@/Users/seancannon/.config/opencode/agent-cannon/workflows/verify.md
+@~/.config/opencode/agent-cannon/workflows/verify.md
 </execution_context>
 
 <context>
