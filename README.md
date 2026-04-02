@@ -6,7 +6,7 @@
 <br/>
 
 <div align="center" style="color:#999; font-family:Georgia,serif; font-size:15px; line-height:1.8;">
-  An open-source AI coding agent that enforces best practices during pair-programming.<br/>
+  An open-source AI coding agent that automates best practices during pair-programming.<br/>
   Built on <em><a href="https://github.com/succeedinsoftware/book" target="_blank">Succeed In Software</a></em> by Sean Cannon. 
   30 years of industry experience, automated.
 <br /><br />
@@ -25,78 +25,60 @@
 
 ---
 
-<table width="100%" style="border:none; border-collapse:collapse;">
-<tr>
-<td width="50%" valign="top" style="padding:0 20px 0 0;">
-
 ### What It Does
 
-Every time the AI writes code, Agent Cannon checks it. Strategy pattern violations get flagged. Missing tests get flagged. Mutation, side effects, hardcoded secrets, commented-out code. All flagged. CRITICAL violations block the commit. No exceptions.
+Every time the AI writes code, Agent Cannon runs checks. Strategy pattern violations get flagged. Missing tests get flagged. Mutation, side effects, hardcoded secrets, commented-out code. All reported. Verification agents run against the actual code and surface findings. The developer decides what to do with them.
 
-It's not a suggestion tool. It's an enforcement layer.
-
-</td>
-<td width="50%" valign="top" style="padding:0 0 0 20px;">
+CRITICAL violations are surfaced with recommendations. The developer can override or fix.
 
 ### What Makes It Different
 
 | Other Tools | Agent Cannon |
 |-------------|-------------|
-| Suggest improvements | Block non-compliant code |
-| Passive rules in prompt | Active agents after every write |
-| Generic best practices | Book-backed, tested rules |
-| Hope AI remembers | Spawn agents that check |
-
-</td>
-</tr>
-</table>
+| Generic suggestions | Book-backed rules from *Succeed In Software* |
+| Passive rules in prompt | Active agents that read the actual code |
+| Hope AI remembers | Verification agents that check and report |
+| No build verification | Runs build and tests before claiming done |
 
 ---
 
-<table style="border-collapse:collapse; width:100%;">
-<tr>
-<td style="border:1px solid #333; padding:16px; background:#0f0f0f; vertical-align:top; width:50%;">
+### Tool-Agnostic Checks
 
-### Tool-Agnostic Enforcement
+Agent Cannon assesses project requirements and researches stack options based on industry adoption, ecosystem maturity, and what fits the problem. It offers options with tradeoffs and lets the developer decide.
 
-Agent Cannon assesses project requirements and researches stack options based on industry adoption, ecosystem maturity, and what fits the problem. It doesn't prescribe a single language. It offers options with tradeoffs and lets the developer decide.
+Paradigms shift across languages. Currying for DI is idiomatic in JavaScript but weird in Rust, where trait bounds do the job. Mutation is a bug in JavaScript but idiomatic in Rust when you own the data. The checks adapt to the language, not the other way around.
 
-Paradigms shift across languages. Currying for DI is idiomatic in JavaScript but weird in Rust, where trait bounds do the job. Mutation is a bug in JavaScript but idiomatic in Rust when you own the data. The enforcement adapts to the language, not the other way around.
-
-</td>
-<td style="border:1px solid #333; padding:16px; background:#0f0f0f; vertical-align:top; width:50%;">
+Supported languages include JavaScript/TypeScript, Rust, Python, Go, and others.
 
 ### Paradigm by Language
 
-| Paradigm | JS/TS | Rust |
-|----------|-------|------|
-| Mutation | Clone first | Fine if you own it |
-| DI pattern | Inject via params | Trait bounds |
-| Strategy | Strategy maps | Match expressions |
-| Composition | Function chains | Iterator chains |
-| Error handling | Throw or Result | Result/Option |
+Examples. Agent Cannon adapts to the language.
 
-</td>
-</tr>
-</table>
+| Paradigm | JS/TS | Rust | Python | Go |
+|----------|-------|------|--------|-----|
+| Mutation | Clone first | Fine if you own it | Clone first | Fine if you own it |
+| DI pattern | Inject via params | Trait bounds | Inject via params | Inject via params |
+| Strategy | Strategy maps | Match expressions | Strategy maps/classes | Match expressions |
+| Composition | Function chains | Iterator chains | Function chains | Function chains |
+| Error handling | Throw or Result | Result/Option | Exceptions or Result | Error returns |
 
 ---
 
 ## Core Principles
 
-From *Succeed In Software* by Sean Cannon. Agent Cannon enforces all of them.
+From *Succeed In Software* by Sean Cannon. Agent Cannon runs automated checks for all of them.
 
 ### 1. Strategy Pattern
 
 Logic that branches on a type doesn't belong in if/else chains. Create a strategy map. Each key is a behavior, each value is the function. The dispatcher looks up the key and runs it. Two lines replace fifty.
 
-**Enforcement:** Flags 3+ else-if branches or 4+ switch/case blocks. Two branches are fine. Three means you need a strategy map.
+**Checks:** Flags 3+ else-if branches or 4+ switch/case blocks. Two branches are fine. Three means consider a strategy map.
 
 ### 2. Pure Functions
 
 Same input, same output, every time. No file reads, no API calls, no global state, no modifying what was passed in. If your function takes an array and pushes to it, the caller's data just changed. Clone it first.
 
-**Enforcement:** Blocks .push(), .pop(), .splice(), .sort(), .reverse() on parameters.
+**Checks:** Reports mutation of input parameters (e.g., .push/.pop in JS/TS, list.append in Python, vector.push in Rust).
 
 ### 3. Functional Programming
 
@@ -118,7 +100,7 @@ A 200-line module doing one thing beats five 40-line modules doing fragments of 
 
 ### 6. Self-Documenting Code
 
-Comments explain why, not what. If you need a comment to explain what a function does, rename it. calculateTotalWithTax() doesn't need a comment. process() does. That means process() is the wrong name.
+Comments explain why, not what. If you need a comment to explain what a function does, rename it. processPayment() doesn't need a comment. doStuff() does. That means doStuff() is the wrong name.
 
 ### 7. Consistency
 
@@ -150,8 +132,20 @@ Stateless architecture so you add servers without coordination. Horizontal over 
 
 ### Prerequisites
 
+**Required:**
 - [OpenCode](https://opencode.ai) installed
-- Node.js 18+
+- Node.js 18+ (runs the ac-tools CLI)
+
+**For language-specific checks (install based on your project):**
+
+| Language | Tools |
+|----------|-------|
+| TypeScript/JavaScript | ESLint, TypeScript, Jest/Vitest |
+| Python | Ruff, Mypy, Pytest |
+| Rust | Clippy, Cargo |
+| Go | golangci-lint, Go toolchain |
+
+Agent Cannon configures linting per-project during `/ac-new-project`. Tool installation is deferred until then.
 
 ### Steps
 
@@ -180,7 +174,7 @@ node ~/.config/opencode/agent-cannon/bin/ac-tools.cjs help
 </tr>
 <tr>
 <td style="border:1px solid #333; padding:10px;"><code>/ac-new-project</code></td>
-<td style="border:1px solid #333; padding:10px;">Initialize a new project with Agent Cannon enforcement</td>
+<td style="border:1px solid #333; padding:10px;">Initialize a new project with Agent Cannon checks configured</td>
 </tr>
 <tr>
 <td style="border:1px solid #333; padding:10px;"><code>/ac-plan-phase &lt;N&gt;</code></td>
@@ -229,13 +223,13 @@ node ~/.config/opencode/agent-cannon/bin/ac-tools.cjs help
 
 ```
 AI writes code
-  > Spawn 5 verification agents in parallel
-  > CRITICAL violation? BLOCK. Show violations. Don't commit.
-  > WARNING only? LOG it. Continue.
-  > Clean? COMMIT. Continue to next task.
+  > Verification agents run against the actual code
+  > Surface findings: what passed, what flagged
+  > CRITICAL issues? Report them with recommendations
+  > Developer decides: fix or override with documentation
 ```
 
-30-second timeout per agent. A hung agent reports as WARNING, not BLOCKED.
+30-second timeout per agent. A hung agent reports as warning, not failure.
 
 ---
 
@@ -260,7 +254,7 @@ AI writes code
 <tr>
 <td style="border:1px solid #333; padding:10px;">Anti-Pattern Detector</td>
 <td style="border:1px solid #333; padding:10px;">Mutation, side effects, condition-heavy branching, commented code, hardcoded secrets</td>
-<td style="border:1px solid #333; padding:10px; text-align:center;">CRITICAL only</td>
+<td style="border:1px solid #333; padding:10px; text-align:center;">CRITICAL / WARNING</td>
 </tr>
 <tr>
 <td style="border:1px solid #333; padding:10px;">Code Quality</td>
@@ -269,7 +263,7 @@ AI writes code
 </tr>
 <tr>
 <td style="border:1px solid #333; padding:10px;">Orchestrator</td>
-<td style="border:1px solid #333; padding:10px;">Spawns all agents in parallel, aggregates, makes block/allow decision</td>
+<td style="border:1px solid #333; padding:10px;">Spawns all agents in parallel, aggregates findings, surfaces to developer</td>
 <td style="border:1px solid #333; padding:10px; text-align:center;">Decision layer</td>
 </tr>
 </table>
@@ -287,7 +281,8 @@ AI writes code
 │       ├── pure-functions.md
 │       ├── testing-standards.md
 │       ├── anti-patterns.md
-│       └── code-quality.md
+│       ├── code-quality.md
+│       └── linter-configs.md         Stack-specific lint configs
 ├── agents/
 │   ├── ac-pattern-checker.md
 │   ├── ac-test-verifier.md
