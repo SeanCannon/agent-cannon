@@ -94,6 +94,47 @@ Documentation priorities:
 - Code comments explain why, never what. If the code needs a comment to explain itself, rename it.
 - Unit tests serve as living documentation of system intent and behavior.
 
+**10. NEVER create stub or facade mocks. Every mock must be a working strategy.**
+A mock that does nothing is a lie. It gives a false sense of progress, misleads agents reading the code, and forces test rewrites when replaced with real implementations. If you need to mock functionality for development, embed it in a working strategy handler that does the thing. A placeholder strategy is fine. A stub that breaks the contract is not.
+
+```js
+// WRONG - facade mock, does nothing, forces test rewrite later
+const mockHandler = { handle: () => {} };
+
+// CORRECT - working strategy with actual mocked behavior
+const mockHandler = { handle: (data) => ({ ...data, status: 'mocked' }) };
+```
+
+Golden rule: if the unit tests have to change when you replace a placeholder with real code, the original was architected short-sightedly. Write tests once against the strategy interface, not against specific implementations.
+
+**11. ALWAYS separate utility logic from application logic.**
+Utility logic is pure, composable, and deployable independently. Application logic wires utilities into your specific project. Never the reverse. Third-party dependencies live in utility strategies, never in application code. When you pivot or change your mind, you only rewrite application logic, not the utilities that took time to get right.
+
+Stack conventions:
+- `lib/` or `core/` for utility logic
+- `app/`, `services/`, or your framework's conventions for application logic
+
+```js
+// WRONG - third party in application layer
+app.post('/users', async (req, res) => {
+  const user = await axios.post('/users', req.body);
+  res.json(user.data);
+});
+
+// CORRECT - utility exposes the contract, owns the implementation
+// lib/api/user.js - utility strategy, owns axios, can be deployed standalone
+export const createUser = (userData) => apiClient.post('/users', userData);
+
+// app/handlers/users.js - application logic, no third party imports
+import { createUser } from 'lib/api/user';
+app.post('/users', async (req, res) => {
+  const user = await createUser(req.body);
+  res.json(user);
+});
+```
+
+Design utilities so each service could be extracted to its own package or server. When a utility grows beyond its original context or shows signs of being reused, extract it. When you disagree with this rule on a greenfield project, refactor toward it incrementally. The user can always dismiss the recommendation.
+
 ---
 
 ## Language Awareness
@@ -159,6 +200,8 @@ If a pattern is idiomatic in the target language, don't flag it as a violation j
 
 11. **Scalability** Design stateless architecture. Support horizontal scaling. Use data-driven configuration over hardcoded behavior.
 
+12. **Utility/Application Separation** Third-party dependencies belong in utility strategies, not application code. Code utility logic so each service could be deployed independently. When you pivot, only application logic should need rewriting.
+
 ---
 
 ## Anti-Patterns
@@ -174,6 +217,8 @@ These are language-aware. Some patterns are anti-patterns in one language and id
 | **Commented-out code** | WRONG | WRONG | WRONG |
 | **Unwrap/panic in library code** | N/A | WRONG, use Result | N/A |
 | **God functions (50+ lines)** | WRONG | WRONG | WRONG |
+| **Stub/facade mocks** | WRONG, must be working strategy | WRONG, must be working strategy | WRONG, must be working strategy |
+| **Third party deps in app layer** | WRONG, utility layer only | WRONG, utility layer only | WRONG, utility layer only |
 
 ---
 
