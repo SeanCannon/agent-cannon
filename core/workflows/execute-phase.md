@@ -141,9 +141,60 @@ Execute each wave in sequence. Within a wave: parallel if `PARALLELIZATION=true`
 
 3. **Wait for all agents in wave to complete.**
 
-4. **VERIFICATION GATE — spawn ac-orchestrator for each modified file:**
+4. **VERIFICATION GATE — verify actual changes vs planned:**
 
-   For each file listed in the plan's `files_modified`:
+   **Step 4a: Git Diff Verification (catch hallucinations)**
+   ```
+   bash
+   node ~/.config/opencode/agent-cannon/bin/ac-tools.cjs verify-git-diff HEAD
+   ```
+   
+   Parse the `files_changed` array. Compare against the plan's `files_modified`:
+   
+   | Condition | Action |
+   |-----------|--------|
+   | `files_changed` includes file in `files_modified` | Expected — proceed |
+   | `files_changed` has files NOT in `files_modified` | Extra files — log as INFO |
+   | `files_modified` has files NOT in `files_changed` | **HALLUCINATION — executor claimed changes that weren't written** |
+   
+   **If HALLUCINATION detected:**
+   ```
+   ---
+   ## HALLUCINATION DETECTED
+   
+   **Plan:** {plan_id}
+   **Claimed files (from plan):** {files_modified}
+   **Actual changes (from git):** {files_changed}
+   
+   **Missing:** {files in files_modified but not in git diff}
+   
+   **Action Required:** Executor claimed changes that were never written.
+   Options: Abort / Force proceed (not recommended)
+   ---
+   ```
+   
+   **Step 4b: Run build verification (catch syntax/type errors)**
+   
+   Detect project type and run appropriate build:
+   ```bash
+   # JavaScript/TypeScript
+   npx tsc --noEmit 2>/dev/null || echo "Build check skipped"
+   
+   # Rust
+   cargo build 2>/dev/null || echo "Build check skipped"
+   
+   # Python
+   python -m py_compile *.py 2>/dev/null || echo "Build check skipped"
+   
+   # Go
+   go build ./... 2>/dev/null || echo "Build check skipped"
+   ```
+   
+   If build fails → **BLOCK** with build errors.
+
+   **Step 4c: Spawn ac-orchestrator for each actually modified file:**
+
+   For each file in `files_changed` (from git diff):
    ```
    Task(
      subagent_type="ac-orchestrator",
@@ -343,11 +394,13 @@ Orchestrator: ~10-15% context. Subagents: fresh 200k each. No polling (Task bloc
 </context_efficiency>
 
 <failure_handling>
+- **HALLUCINATION detected:** Executor claimed changes that don't appear in git diff → BLOCK, do NOT commit, report discrepancy
 - **Verification gate BLOCKED:** Present CRITICAL violations, do NOT commit, user decides fix/skip/abort
 - **Agent fails mid-plan:** Missing SUMMARY.md → report, ask user how to proceed
 - **Dependency chain breaks:** Wave 1 fails → Wave 2 dependents likely fail → user chooses attempt or skip
 - **All agents in wave fail:** Systemic issue → stop, report for investigation
 - **Verification timeout:** Agent timeout → WARNING (not BLOCKED), continue with advisory
+- **Build fails:** BLOCK, do NOT commit, present build errors
 </failure_handling>
 
 <resumption>
@@ -358,6 +411,8 @@ STATE.md tracks: last completed plan, current wave, pending checkpoints.
 
 <success_criteria>
 - [ ] All plans executed across waves
+- [ ] Git diff verification: actual changes match files_modified (no hallucinations)
+- [ ] Build verification: code compiles/passes type checks
 - [ ] Verification gate run after EACH code write (not batched)
 - [ ] CRITICAL violations blocked acceptance (code not committed)
 - [ ] WARNING violations logged and accepted

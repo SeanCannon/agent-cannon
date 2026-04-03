@@ -96,8 +96,6 @@ Inject dependencies. Pass the database as a parameter. Every function becomes te
 
 Data transformation is separate from I/O. Utility functions separate from application logic. A function that validates, queries, formats, and sends email has four jobs. Split them.
 
-A 200-line module doing one thing beats five 40-line modules doing fragments of three things.
-
 ### 6. Self-Documenting Code
 
 Comments explain why, not what. If you need a comment to explain what a function does, rename it. processPayment() doesn't need a comment. doStuff() does. That means doStuff() is the wrong name.

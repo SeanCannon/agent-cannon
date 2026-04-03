@@ -16,6 +16,9 @@ const COMMANDS = {
   'verify-pattern': 'Run pattern checker only',
   'verify-test': 'Run test verifier only',
   'verify-anti-pattern': 'Run anti-pattern detector only',
+  'verify-git-diff': 'Compare actual changes against planned files_modified',
+  'verify-claims': 'Verify claimed content actually exists in files (catch hallucinations)',
+  'verify-makefile-target': 'Verify a Makefile target exists',
   'state-update': 'Update STATE.md with plan completion',
   'state get': 'Read a specific key from STATE.md',
   'roadmap get-phase': 'Get phase info from ROADMAP.md',
@@ -32,6 +35,9 @@ function printHelp() {
   console.log('  verify-pattern <file>       Run pattern checker only');
   console.log('  verify-test <file>          Run test verifier only');
   console.log('  verify-anti-pattern <file>  Run anti-pattern detector only');
+  console.log('  verify-git-diff <base> [head] Compare actual changes vs planned files');
+  console.log('  verify-claims <json>        Verify claimed content exists in files');
+  console.log('  verify-makefile-target <target> [makefile]  Verify a target exists');
   console.log('  state-update <planId> <status>  Update STATE.md with plan completion');
   console.log('  state get <key>             Read a specific key from STATE.md');
   console.log('  roadmap get-phase <N>       Get phase info from ROADMAP.md');
@@ -237,6 +243,118 @@ function checkAntiPatterns(file) {
   }
 
   return violations;
+}
+
+// ---- Git Diff Verifier ----
+function verifyGitDiff(baseRef = 'HEAD', headRef = 'WORKDIR') {
+  try {
+    const changedFiles = execSync(`git diff --name-only ${baseRef} ${headRef} 2>/dev/null || git diff --name-only ${baseRef}`, {
+      encoding: 'utf8',
+    }).trim().split('\n').filter(Boolean);
+
+    return {
+      status: 'SUCCESS',
+      files_changed: changedFiles,
+      count: changedFiles.length,
+    };
+  } catch (e) {
+    return {
+      status: 'ERROR',
+      error: e.message,
+      files_changed: [],
+      count: 0,
+    };
+  }
+}
+
+// ---- Claims Verifier ----
+// Verifies that claimed content actually exists in files.
+// Input: JSON string like '{"Makefile": ["verify:", "test:"], "src/foo.ts": ["export function"]}'
+// Output: For each file and claim, reports whether it was found.
+function verifyClaims(claimsJson) {
+  let claims;
+  try {
+    claims = JSON.parse(claimsJson);
+  } catch (e) {
+    console.error(JSON.stringify({ error: 'Invalid JSON', exit_code: 2 }));
+    process.exit(2);
+  }
+
+  const results = [];
+  let hasMisses = false;
+
+  for (const [filePath, claimedItems] of Object.entries(claims)) {
+    const resolved = path.resolve(filePath);
+    if (!fs.existsSync(resolved)) {
+      results.push({
+        file: filePath,
+        status: 'FILE_NOT_FOUND',
+        claimed: claimedItems,
+        found: [],
+        missing: claimedItems,
+      });
+      hasMisses = true;
+      continue;
+    }
+
+    const content = fs.readFileSync(resolved, 'utf8');
+    const found = [];
+    const missing = [];
+
+    for (const item of claimedItems) {
+      if (content.includes(item)) {
+        found.push(item);
+      } else {
+        missing.push(item);
+        hasMisses = true;
+      }
+    }
+
+    results.push({
+      file: filePath,
+      status: missing.length === 0 ? 'ALL_FOUND' : 'MISSING_CLAIMS',
+      claimed: claimedItems,
+      found,
+      missing,
+    });
+  }
+
+  return {
+    status: hasMisses ? 'HALLUCINATION_DETECTED' : 'ALL_CLAIMS_VERIFIED',
+    results,
+    summary: {
+      files_checked: results.length,
+      files_with_missing_claims: results.filter(r => r.status === 'MISSING_CLAIMS' || r.status === 'FILE_NOT_FOUND').length,
+    },
+  };
+}
+
+// ---- Makefile Target Verifier ----
+function verifyMakefileTarget(target, makefilePath = 'Makefile') {
+  const resolved = path.resolve(makefilePath);
+  if (!fs.existsSync(resolved)) {
+    console.error(JSON.stringify({ error: `Makefile not found: ${resolved}`, exit_code: 2 }));
+    process.exit(2);
+  }
+
+  const content = fs.readFileSync(resolved, 'utf8');
+  const targetPattern = new RegExp(`^${target}\\s*:`, 'm');
+  const targetRegex = new RegExp(`^${target}\\s*:`);
+
+  if (targetRegex.test(content)) {
+    return {
+      status: 'TARGET_FOUND',
+      target,
+      makefile: resolved,
+    };
+  } else {
+    return {
+      status: 'TARGET_NOT_FOUND',
+      target,
+      makefile: resolved,
+      suggestion: `Add "${target}:" target to Makefile`,
+    };
+  }
 }
 
 // ---- State Update ----
@@ -536,6 +654,35 @@ switch (command) {
     const violations = checkAntiPatterns(filePath);
     console.log(JSON.stringify({ file: filePath, violations }, null, 2));
     process.exit(violations.some(v => v.severity === 'CRITICAL') ? 1 : 0);
+  }
+
+  case 'verify-git-diff': {
+    const baseRef = fileArg || 'HEAD';
+    const headRef = args[2] || 'WORKDIR';
+    const result = verifyGitDiff(baseRef, headRef);
+    console.log(JSON.stringify(result, null, 2));
+    process.exit(result.status === 'ERROR' ? 2 : 0);
+  }
+
+  case 'verify-claims': {
+    if (!fileArg) {
+      console.error(JSON.stringify({ error: 'No claims JSON provided', exit_code: 2 }));
+      process.exit(2);
+    }
+    const result = verifyClaims(fileArg);
+    console.log(JSON.stringify(result, null, 2));
+    process.exit(result.status === 'HALLUCINATION_DETECTED' ? 1 : 0);
+  }
+
+  case 'verify-makefile-target': {
+    if (!fileArg) {
+      console.error(JSON.stringify({ error: 'No target provided', exit_code: 2 }));
+      process.exit(2);
+    }
+    const makefile = args[2] || 'Makefile';
+    const result = verifyMakefileTarget(fileArg, makefile);
+    console.log(JSON.stringify(result, null, 2));
+    process.exit(result.status === 'TARGET_NOT_FOUND' ? 1 : 0);
   }
 
   case 'state-update': {
