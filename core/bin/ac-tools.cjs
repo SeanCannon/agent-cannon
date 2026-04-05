@@ -3,7 +3,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { execSync } = require('child_process');
+const { execSync, spawnSync } = require('child_process');
 
 // ============================================================
 // Agent Cannon CLI Tool (ac-tools.cjs)
@@ -62,8 +62,16 @@ function ensureFile(filePath) {
 
 function runGrep(pattern, file, flags = '') {
   try {
-    const result = execSync(`grep -n ${flags} '${pattern}' '${file}' 2>/dev/null || true`, { encoding: 'utf8' });
-    return result.trim().split('\n').filter(Boolean).map(line => {
+    const args = ['-n'];
+    if (flags) {
+      args.push(...flags.split(' ').filter(Boolean));
+    }
+    args.push(pattern, file);
+    
+    const result = spawnSync('grep', args, { encoding: 'utf8' });
+    if (!result.stdout) return [];
+    
+    return result.stdout.trim().split('\n').filter(Boolean).map(line => {
       const [num, ...rest] = line.split(':');
       return { line: parseInt(num, 10), match: rest.join(':').trim() };
     });
@@ -248,9 +256,18 @@ function checkAntiPatterns(file) {
 // ---- Git Diff Verifier ----
 function verifyGitDiff(baseRef = 'HEAD', headRef = 'WORKDIR') {
   try {
-    const changedFiles = execSync(`git diff --name-only ${baseRef} ${headRef} 2>/dev/null || git diff --name-only ${baseRef}`, {
-      encoding: 'utf8',
-    }).trim().split('\n').filter(Boolean);
+    let result;
+    if (headRef === 'WORKDIR') {
+      result = spawnSync('git', ['diff', '--name-only', baseRef], { encoding: 'utf8' });
+    } else {
+      result = spawnSync('git', ['diff', '--name-only', baseRef, headRef], { encoding: 'utf8' });
+    }
+    
+    if (result.error || result.status !== 0) {
+      throw new Error(result.stderr || 'Git diff command failed');
+    }
+
+    const changedFiles = (result.stdout || '').trim().split('\n').filter(Boolean);
 
     return {
       status: 'SUCCESS',
