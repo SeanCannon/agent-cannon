@@ -18,7 +18,7 @@
 <table width="100%" style="border:none; border-collapse:collapse;">
 <tr>
 <td align="center" style="border:1px solid #333; padding:14px 24px; background:#111; color:#aaa; font-family:monospace; font-size:14px;">
-  git clone https://github.com/seancannon/agent-cannon.git && cd agent-cannon && bash core/install.sh
+  git clone https://github.com/seancannon/agent-cannon.git && cd agent-cannon && npm install && npm run install:opencode
 </td>
 </tr>
 </table>
@@ -150,10 +150,11 @@ Agent Cannon configures linting per-project during `/ac-new-project`. Tool insta
 ```bash
 git clone https://github.com/seancannon/agent-cannon.git
 cd agent-cannon
-bash core/install.sh
+npm install
+npm run install:opencode
 ```
 
-The install script copies rules, agents, commands, and workflows to `~/.config/opencode/` and updates `opencode.json` to load Agent Cannon rules at session start.
+The install script (`core/install.js`) copies rules, agents, commands, and workflows to `~/.config/opencode/` and updates `opencode.json` to load Agent Cannon rules at session start.
 
 ### Verify
 

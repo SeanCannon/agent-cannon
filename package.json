@@ -1,0 +1,22 @@
+{
+  "name": "agent-cannon",
+  "version": "0.1.0",
+  "description": "An open-source AI coding agent that automates best practices during pair-programming.",
+  "main": "core/bin/ac-tools.cjs",
+  "bin": {
+    "ac-tools": "core/bin/ac-tools.cjs",
+    "agent-cannon": "core/bin/ac-tools.cjs"
+  },
+  "scripts": {
+    "install:opencode": "node core/install.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/seancannon/agent-cannon.git"
+  },
+  "author": "Sean Cannon",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
