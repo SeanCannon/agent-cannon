@@ -625,6 +625,130 @@ echo "All checks passed"
 | FP composition | ramda-eslint | - | - | - |
 | Cognitive complexity | eslint-complexity | ruff C901 | clippy cognitive_complexity | golangci-lint gocognit |
 
+## Security Checks by Language
+
+### TS/JS - eslint-plugin-security
+
+```bash
+npm install --save-dev eslint-plugin-security
+```
+
+```js
+// eslint.config.js
+import security from 'eslint-plugin-security';
+
+export default [
+  {
+    plugins: { security },
+    rules: {
+      // Detect SQL injection patterns
+      'security/detect-sql-injection': 'error',
+      // Detect object injection
+      'security/detect-object-injection': 'error',
+      // Detect unsafe regular expressions (ReDoS)
+      'security/detect-unsafe-regex': 'error',
+      // Detect non-literal filesystem path
+      'security/detect-non-literal-fs-path': 'error',
+      // Detect non-literal require/import
+      'security/detect-non-literal-require': 'error',
+      // Detect eval with non-literal
+      'security/detect-eval-with-non-literal': 'error',
+      // Detect process env access without validation
+      'security/detect-possible-timing-attacks': 'error',
+      // Detect disabled security controls
+      'security/detect-disable-mustache-escape': 'error',
+    }
+  }
+]
+```
+
+### Python - bandit
+
+```bash
+pip install bandit
+```
+
+```bash
+# Run with detailed output
+bandit -r ./src -f json -o bandit-report.json
+
+# Critical findings
+bandit -r ./src -lll  # lll = very high severity
+```
+
+```yaml
+# pyproject.toml
+[tool.bandit]
+target = ['src/']
+exclude = ['tests/', 'venv/']
+skips = ['B413']  # skip blacklist crypto check if using hashlib
+```
+
+### Rust - clippy security
+
+```bash
+cargo clippy -- -D warnings
+```
+
+Key security-focused clippy lints:
+- `hardcoded_unit_bindings`: Unit bindings in unsafe blocks
+- `ctypes`: Passing raw bool to C
+- `not_unsafe_ptr_arg_deref`: Unsafe function args
+- `drop_ref`: Dropping reference type
+
+### Go - gosec
+
+```bash
+go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+```
+
+```yaml
+# .golangci.yml
+linters:
+  enable:
+    - gosec
+
+linters-settings:
+  gosec:
+    excludes:
+      - G104  # Unhandled errors
+      - G306  # Trust permission not set
+```
+
+---
+
+## Security Verification Commands
+
+### Quick Security Scan
+
+```bash
+# JavaScript/TypeScript
+npx eslint --plugin security -r . 2>/dev/null || echo "No security issues"
+
+# Python
+bandit -r ./src -lll -q
+
+# Rust
+cargo clippy -- -W clippy::all -A clippy::undocumented_unsafe_blocks
+
+# Go
+golangci-lint run --disable-all -E gosec
+```
+
+### Comprehensive Security Suite
+
+```bash
+# Run all security checks
+echo "=== Security Scan ==="
+echo "JS Security:"; npx eslint --plugin security src/ 2>/dev/null || true
+echo "Python Security:"; bandit -r src/ -lll -q 2>/dev/null || true
+echo "Rust Security:"; cargo clippy -- -D clippy::all 2>/dev/null || true
+echo "Go Security:"; golangci-lint run --enable gosec 2>/dev/null || true
+echo "=== Complete ==="
+```
+
+---
+
 ## Custom Rules by Language
 
 ### TS/JS
